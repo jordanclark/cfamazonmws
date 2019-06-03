@@ -1,0 +1,40 @@
+{
+    "name":"cfamazonmws",
+    "slug":"cfamazonmws",
+    "version":"0.5.0",
+    "author":"Jordan Clark <jordanclark@gmail.com>",
+    "keywords":[
+		"aws",
+		"amazon",
+		"aws mws",
+		"mws",
+        "api",
+        "rest"
+    ],
+    "shortDescription":"API client for amazon mws",
+    "type":"modules",
+    "location":"jordanclark/cfamazonmws#v0.5.0",
+    "repository":{
+        "URL":"https://github.com/jordanclark/cfamazonmws.git",
+        "type":"GIT"
+    },
+    "homepage":"https://github.com/jordanclark/cfamazonmws",
+    "bugs":"https://github.com/jordanclark/cfamazonmws/issues",
+    "license":[
+        {
+            "type":"Apache-2.0",
+            "URL":"https://github.com/jordanclark/cfamazonmws/blob/master/LICENSE"
+        }
+    ],
+    "private":false,
+    "ignore":[
+        "**/.*",
+        "/test/",
+        "/tests/"
+    ],
+    "scripts":{
+        "postVersion":"package set location='jordanclark/cfamazonmws#v`package version`'",
+        "onRelease":"publish",
+        "postPublish":"!git push --follow-tags"
+    }
+}
