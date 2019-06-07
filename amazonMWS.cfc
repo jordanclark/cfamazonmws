@@ -414,7 +414,7 @@
 	<cfargument name="ReportId" type="string" required="true">
 	<cfargument name="SaveFile" type="string" required="true">
 	
-	<cfset var response = {}>
+	<cfset var http = {}>
 	<cfset var params = buildParams(
 		Action = "GetReport"
 	,	Merchant = this.sellerID
@@ -427,7 +427,7 @@
 	<cfset arguments.url = generateSignedURL( "https", "GET", this.endPoint, "/", this.feedsVersion, params )>
 	
 	<cfhttp
-		result="response"
+		result="http"
 		method="GET"
 		url="#arguments.url#"
 		userAgent="#this.userAgent#"
@@ -437,25 +437,25 @@
 		file="#getFileFromPath( arguments.SaveFile )#"
 	/>
 	
-	<cfset response = duplicate( response )>
-	<cfset response.success = false>
+	<cfset http = duplicate( http )>
+	<cfset http.success = false>
 	
 	<!--- RESPONSE CODE ERRORS --->
-	<cfif isDefined( "response.responseHeader.Status_Code" )>
-		<cfif response.responseHeader.Status_Code IS 503>
-			<cfset response.errorDetail = "Error 503, submitting requests too quickly.">
-		<cfelseif left( response.responseHeader.Status_Code, 1 ) IS 4>
-			<cfset response.errorDetail = "Transient Error #response.responseHeader.Status_Code#, resubmit.">
-		<cfelseif left( response.responseHeader.Status_Code, 1 ) IS 5>
-			<cfset response.errorDetail = "Internal Amazon Error #response.responseHeader.Status_Code#">
-		<cfelseif response.fileContent IS "Connection Timeout" OR response.fileContent IS "Connection Failure">
-			<cfset response.errorDetail = response.fileContent>
-		<cfelseif left( response.responseHeader.Status_Code, 1 ) IS 2>
-			<cfset response.success = true>
+	<cfif isDefined( "http.responseHeader.Status_Code" )>
+		<cfif http.responseHeader.Status_Code IS 503>
+			<cfset http.errorDetail = "Error 503, submitting requests too quickly.">
+		<cfelseif left( http.responseHeader.Status_Code, 1 ) IS 4>
+			<cfset http.errorDetail = "Transient Error #http.responseHeader.Status_Code#, resubmit.">
+		<cfelseif left( http.responseHeader.Status_Code, 1 ) IS 5>
+			<cfset http.errorDetail = "Internal Amazon Error #http.responseHeader.Status_Code#">
+		<cfelseif http.fileContent IS "Connection Timeout" OR http.fileContent IS "Connection Failure">
+			<cfset http.errorDetail = http.fileContent>
+		<cfelseif left( http.responseHeader.Status_Code, 1 ) IS 2>
+			<cfset http.success = true>
 		</cfif>
 	</cfif>
 	
-	<cfreturn response>
+	<cfreturn http>
 </cffunction>
 
 
@@ -725,7 +725,7 @@
 	<cfargument name="body" type="string" default="">
 	
 	<cfset var item = "">
-	<cfset var response = {
+	<cfset var http = {
 		success = false
 	,	errorDetail = ""
 	,	fileContent = ""
@@ -745,7 +745,7 @@
 	</cfif>
 	
 	<cfhttp
-		result="response"
+		result="http"
 		method="#arguments.verb#"
 		url="#arguments.url#"
 		userAgent="#this.userAgent#"
@@ -760,40 +760,40 @@
 		</cfif>
 	</cfhttp>
 	
-	<cfset response = duplicate( response )>
-	<cfset response.success = false>
+	<cfset http = duplicate( http )>
+	<cfset http.success = false>
 	
 	<!--- RESPONSE CODE ERRORS --->
-	<cfif isDefined( "response.responseHeader.Status_Code" )>
-		<cfif response.responseHeader.Status_Code IS 503>
-			<cfset response.errorDetail = "Error 503, submitting requests too quickly.">
-		<cfelseif left( response.responseHeader.Status_Code, 1 ) IS 4>
-			<cfset response.errorDetail = "Transient Error #response.responseHeader.Status_Code#, resubmit.">
-		<cfelseif left( response.responseHeader.Status_Code, 1 ) IS 5>
-			<cfset response.errorDetail = "Internal Amazon Error #response.responseHeader.Status_Code#">
-		<cfelseif response.fileContent IS "Connection Timeout" OR response.fileContent IS "Connection Failure">
-			<cfset response.errorDetail = response.fileContent>
-		<cfelseif left( response.responseHeader.Status_Code, 1 ) IS 2>
-			<cfset response.success = true>
+	<cfif isDefined( "http.responseHeader.Status_Code" )>
+		<cfif http.responseHeader.Status_Code IS 503>
+			<cfset http.errorDetail = "Error 503, submitting requests too quickly.">
+		<cfelseif left( http.responseHeader.Status_Code, 1 ) IS 4>
+			<cfset http.errorDetail = "Transient Error #http.responseHeader.Status_Code#, resubmit.">
+		<cfelseif left( http.responseHeader.Status_Code, 1 ) IS 5>
+			<cfset http.errorDetail = "Internal Amazon Error #http.responseHeader.Status_Code#">
+		<cfelseif http.fileContent IS "Connection Timeout" OR http.fileContent IS "Connection Failure">
+			<cfset http.errorDetail = http.fileContent>
+		<cfelseif left( http.responseHeader.Status_Code, 1 ) IS 2>
+			<cfset http.success = true>
 		</cfif>
 	</cfif>
 	
-	<cfif NOT len( response.errorDetail ) AND find( "<Error>", response.fileContent )>
-		<cfset response.errorDetail = "Response contains an error">
-		<cfset response.xml = xmlParse( response.fileContent )>
+	<cfif NOT len( http.errorDetail ) AND find( "<Error>", http.fileContent )>
+		<cfset http.errorDetail = "Response contains an error">
+		<cfset http.xml = xmlParse( http.fileContent )>
 		<cftry>
-			<cfset response.errorDetail = response.xml.ErrorResponse.Error.Message.XmlText>
+			<cfset http.errorDetail = http.xml.ErrorResponse.Error.Message.XmlText>
 			<cfcatch></cfcatch>
 		</cftry>
 	</cfif>
 	
-	<cfif len( response.errorDetail )>
+	<cfif len( http.errorDetail )>
 		<cftrace type="error" text="Amazon Shopping API Error">
 	<cfelse>
-		<cfset response.success = true>
+		<cfset http.success = true>
 	</cfif>
 	
-	<cfreturn response>
+	<cfreturn http>
 </cffunction>
 
 
