@@ -1,7 +1,7 @@
 {
     "name":"cfamazonmws",
     "slug":"cfamazonmws",
-    "version":"0.5.1",
+    "version":"0.5.2",
     "author":"Jordan Clark <jordanclark@gmail.com>",
     "keywords":[
         "aws",
@@ -13,7 +13,7 @@
     ],
     "shortDescription":"API client for amazon mws",
     "type":"modules",
-    "location":"jordanclark/cfamazonmws#v0.5.1",
+    "location":"jordanclark/cfamazonmws#v0.5.2",
     "repository":{
         "URL":"https://github.com/jordanclark/cfamazonmws.git",
         "type":"GIT"
